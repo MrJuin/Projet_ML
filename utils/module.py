@@ -32,7 +32,7 @@ class Linear(Module):
         initialise les parameters aléatoirement
         """
         if type(dimensions) != type(None):
-           self._parameters = np.random.random(dimensions) - 0.5
+           self._parameters = np.random.random(dimensions) -0.5
         else:
             self._parameters = None
         self._gradient = None

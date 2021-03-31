@@ -57,7 +57,7 @@ class Optim:
         l = self.net.forward(x)
         return self.loss.forward(y, l[0])
     
-    def score_pred(self, x, y):
+    def score_predict(self, x, y):
         yhat = self.net.predict(x)
         return np.sum(yhat == y)/len(yhat)
 

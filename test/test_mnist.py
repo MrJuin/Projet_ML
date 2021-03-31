@@ -16,6 +16,7 @@ tmp = list(zip(digits.data, digits.target))
 np.random.shuffle(tmp)
 data, y = zip(*tmp)
 data = np.array(data)
+data /= np.sum(data, axis = 1).reshape(-1,1)
 y = np.array(y)
 
 def devellope(x):

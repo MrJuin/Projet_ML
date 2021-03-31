@@ -34,13 +34,6 @@ tools.plot_frontiere(data,f,step=20)
 tools.plot_data(data,labels=label)
 # plt.show()
 
-"""
-h = line.forward(X)
-s = mse.forward(h, Y)
-d2 = mse.backward(h, Y)
-d1 = line.backward_delta(X, d2)
-line.backward_update_gradient(X, d2)
-"""
 
 iterations = 10
 

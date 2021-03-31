@@ -32,7 +32,7 @@ class Linear(Module):
         initialise les parameters aléatoirement
         """
         if type(dimensions) != type(None):
-           self._parameters = np.random.random(dimensions)
+           self._parameters = np.random.random(dimensions) - 0.5
         else:
             self._parameters = None
         self._gradient = None
@@ -58,8 +58,6 @@ class Linear(Module):
     
     def zero_grad(self):
         self._gradient = None
-    
-    
     
 class TanH(Module):
     def forward(self, X):
@@ -112,7 +110,3 @@ class Softmax(Module):
     
     def update_parameters(self, gradient_step=1e-3):
         pass
-
-
-    
-    

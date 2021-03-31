@@ -6,7 +6,8 @@ Created on Thu Mar 25 11:52:28 2021
 """
 from utils.loss import MSELoss, BCELoss
 from utils.module import Linear, Sigmoid, TanH, Softmax
-from utils.toolbox import Sequentiel, Optim
+from utils.toolbox import Sequentiel, Optim, SGD
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -37,28 +38,11 @@ h1 = Linear((in_size, h1_size))
 h2 = Linear((h1_size, h2_size))
 h3 = Linear((h2_size, out_size))
 
-seq = Sequentiel(m = [h1, Sigmoid(), h2, Sigmoid(), h3, Softmax()], a = f)
-optim = Optim(seq, MSELoss(), 0.01)
-
+seq = Sequentiel(m = [h1, TanH(), h2, TanH(), h3, Softmax()], a = f)
+optim = Optim(seq, MSELoss(), 0.001)
 label = np.array(list(map(devellope, y)))
 
-def SGD(data, label, optim, batch_size, iterations):
-    b_data  = data.reshape(-1,batch_size,in_size)
-    b_label = label.reshape(-1,batch_size,out_size)
-    
-    mean = []
-    std  = []
-    for i in range(iterations):
-        cpt = []
-        for x, y in zip(b_data, b_label):
-            cpt += [optim.score(x,y)[-1]]
-            optim.step(x, y)
-            
-        mean += [np.mean(cpt)]
-        std  += [np.std(cpt)]
-    return mean, std
-
-mean, std = SGD(data[:1000], y[:1000], optim, 10, 100)
+mean, std = SGD(data[:1000], label[:1000], optim, 10, 3000)
 plt.plot(mean)
 plt.plot(std)
 plt.legend(('mean du mse', 'std du mse'))

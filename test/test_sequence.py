@@ -7,8 +7,9 @@ Created on Thu Mar 25 11:52:28 2021
 from utils.loss import MSELoss 
 from utils.module import Linear, Sigmoid, TanH
 from utils.toolbox import Sequentiel, Optim
+import utils.graphtools as tools
+
 import numpy as np
-import utils.mltools as tools
 import matplotlib.pyplot as plt
 
 

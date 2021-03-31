@@ -23,19 +23,17 @@ class MSELoss(Loss):
     
 
 class BCELoss(Loss):
-    def forward(self, y, yhat):
+    def forward(self, y, yhat, eps = 1e-10):
         """
         input  : batch*d
         output : batch
         """
         assert len(y.shape) == 2
         assert len(yhat.shape) == 2
-        eps = 1e-10
-
         return - (y* np.log(yhat+eps) + (1-y)*np.log(1-yhat+eps))
 
-    def backward(self, y, yhat):
-        return ((1-y)/(1-yhat)) - (y/yhat)
+    def backward(self, y, yhat, eps = 1e-10):
+        return ((1-y)/(1-yhat +eps)) - (y/(yhat +eps))
 
 
 

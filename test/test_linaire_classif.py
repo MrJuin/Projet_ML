@@ -4,9 +4,10 @@ Created on Thu Mar 25 11:52:28 2021
 
 @author: Luc
 """
-from module import MSELoss, Linear
+from utils.loss import MSELoss
+from utils.module import  Linear
+import utils.graphtools as tools
 import numpy as np
-import mltools as tools
 import matplotlib.pyplot as plt
 
 
@@ -50,7 +51,6 @@ for i in range(iterations):
         
         line.backward_update_gradient(X, d2)
         line.update_parameters(gradient_step=1e-3)
-        raise
         line.zero_grad()
         tools.plot_frontiere(data,f,step=20)
         tools.plot_data(data,labels=label)

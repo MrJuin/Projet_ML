@@ -4,9 +4,11 @@ Created on Thu Mar 25 11:52:28 2021
 
 @author: Luc
 """
-from utils.module import MSELoss, Linear, Sigmoid, TanH
+from utils.module import Linear, Sigmoid, TanH
+from utils.loss import MSELoss
+import utils.graphtools as tools
+
 import numpy as np
-import utils.mltools as tools
 import matplotlib.pyplot as plt
 
 
@@ -66,7 +68,7 @@ for i in range(iterations):
         
         cpt += [mse.forward(y, x6)]
         
-        d6 = mse.backward(x6, y)
+        d6 = mse.backward(y, x6)
         
         d5 = sig.backward_delta(x5, d6)
         d4 = h3.backward_delta(x4, d5)

@@ -4,8 +4,9 @@ Created on Thu Mar 25 11:52:28 2021
 
 @author: Luc
 """
-from utils.module import MSELoss, BCELoss
-from utils.module import Linear, Sigmoid, TanH, Sequentiel, Optim, Softmax
+from utils.loss import MSELoss, BCELoss
+from utils.module import Linear, Sigmoid, TanH, Softmax
+from utils.toolbox import Sequentiel, Optim
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -39,11 +40,11 @@ h3 = Linear((h2_size, out_size))
 seq = Sequentiel(m = [h1, Sigmoid(), h2, Sigmoid(), h3, Softmax()], a = f)
 optim = Optim(seq, MSELoss(), 0.01)
 
+label = np.array(list(map(devellope, y)))
+
 def SGD(data, label, optim, batch_size, iterations):
     b_data  = data.reshape(-1,batch_size,in_size)
-    l = np.array(list(map(devellope, label)))
-    b_label = l.reshape(-1,batch_size,out_size)
-    
+    b_label = label.reshape(-1,batch_size,out_size)
     
     mean = []
     std  = []

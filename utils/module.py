@@ -1,12 +1,5 @@
 import numpy as np
 
-class Loss(object):
-    def forward(self, y, yhat):
-        pass
-
-    def backward(self, y, yhat):
-        pass
-
 class Module(object):
     def __init__(self):
         self._parameters = None
@@ -31,20 +24,6 @@ class Module(object):
     def backward_delta(self, input, delta):
         ## Calcul la derivee de l'erreur
         pass
-
-class MSELoss(Loss):
-    def forward(self, y, yhat):
-        """
-        input  : batch*d
-        output : batch
-        """
-        assert len(y.shape) == 2
-        assert len(yhat.shape) == 2
-        return np.sum(np.power(y-yhat,2), axis = 1)
-
-    def backward(self, y, yhat):
-        return -2*(y-yhat)
-    
 
 class Linear(Module):    
     def __init__(self, dimensions = None):
@@ -134,67 +113,6 @@ class Softmax(Module):
     def update_parameters(self, gradient_step=1e-3):
         pass
 
-class BCELoss(Loss):
-    def forward(self, y, yhat):
-        """
-        input  : batch*d
-        output : batch
-        """
-        assert len(y.shape) == 2
-        assert len(yhat.shape) == 2
-        eps = 1e-10
 
-        return - (y* np.log(yhat+eps) + (1-y)*np.log(1-yhat+eps))
-
-    def backward(self, y, yhat):
-        return ((1-y)/(1-yhat)) - (y/yhat)
-
-
-class Sequentiel:
-    def __init__(self, m = None, a = None):
-        self.modules = m
-        self.activation = a
-
-    def forward(self, x):
-        l = [x]
-        for m in self.modules:
-            l += [m.forward(l[-1])]
-        l.reverse()
-        return l
-        
-    def backward(self, l, d0):
-        """
-        Prend une liste de sortie du réseau(venant de forward)
-        et un delta d'une fonction de cout
-        """
-        d = [d0]
-        for i, m in enumerate(np.flip(self.modules)):
-            m.backward_update_gradient(l[i+1], d[-1])
-            d += [m.backward_delta(l[i+1] , d[-1])]
-    
-    def apply_gradients(self, eps = 1e-2):
-        for m in self.modules:
-            m.update_parameters(gradient_step=eps)
-            m.zero_grad()
-                
-    def predict(self, x):
-        return self.activation(self.forward(x)[0])
-
-
-class Optim:
-    def __init__(self, net, loss, eps = 1e-2):
-        self.net  = net
-        self.loss = loss
-        self.eps  = eps
-        
-    def step(self,b_x, b_y):
-        l = self.net.forward(b_x)
-        d = self.loss.backward(b_y, l[0])
-        self.net.backward(l, d)
-        self.net.apply_gradients(self.eps)
-        
-    def score(self, x, y):
-        l = self.net.forward(x)
-        return self.loss.forward(y, l[0])
     
     

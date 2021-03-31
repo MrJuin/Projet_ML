@@ -2,15 +2,13 @@
 Faire des tests sur les dimensions des fonctions, rapide juste un assert pour Ãªtre sur
 '''
 import numpy as np
-
-import utils.mltools as tools
-from utils.module import MSELoss, Optim, Sequentiel
+from utils.loss import MSELoss
 from utils.module import Linear
-from utils.fonctions import SGD
+from utils.toolbox import SGD, Optim, Sequentiel
 import matplotlib.pyplot as plt
 
-coef1 = 56
-coef2 = 24
+coef1 = 1002
+coef2 = 13
 # fonction linéair que l'on apprend
 def f(x1,x2):
     return x1*coef1 + coef2*x2

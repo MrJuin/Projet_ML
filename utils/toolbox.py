@@ -9,7 +9,7 @@ import numpy as np
 class Sequentiel:
     def __init__(self, m = None, a = None):
         self.modules = m
-        self.activation = a
+        self.activation = a #utiliser pour prédire
 
     def forward(self, x):
         l = [x]
@@ -60,8 +60,7 @@ class Optim:
     def score_predict(self, x, y):
         yhat = self.net.predict(x)
         return np.sum(yhat == y)/len(yhat)
-
-
+            
 def SGD(data, label, optim, batch_size, iterations):
     """
     input :
@@ -76,8 +75,9 @@ def SGD(data, label, optim, batch_size, iterations):
             mean : moyenne des scores de l'optimiseur à chaque itération
             std  : écart-types des scores de l'optimiseur à chaque itération'
     """
-    b_data  = data.reshape(-1,batch_size,data.shape[-1])
-    b_label = label.reshape(-1,batch_size, label.shape[-1])
+    deb = data.shape[0]%batch_size
+    b_data  = data[deb:].reshape(-1,batch_size,data.shape[-1])
+    b_label = label[deb:].reshape(-1,batch_size, label.shape[-1])
     
     mean = []
     std  = []

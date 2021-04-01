@@ -12,6 +12,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from sklearn.datasets import load_digits
+from sklearn.model_selection import KFold
+
+
 digits = load_digits()
 
 tmp = list(zip(digits.data, digits.target))
@@ -34,20 +37,33 @@ h1_size = 40
 def f(x):
     return np.argmax(x, axis = 1)
 
-h1 = Linear((in_size, h1_size))
-h2 = Linear((h1_size, h2_size))
-h3 = Linear((h2_size, out_size))
 
-seq = Sequentiel(m = [h1, TanH(), h2, TanH(), h3, Softmax()], a = f)
-optim = Optim(seq, MSELoss(), 0.001)
 label = np.array(list(map(devellope, y)))
+"""
 print("score de train avant:",optim.score_predict(data[:1000], y[:1000]))
 print("score de test: avant:",optim.score_predict(data[1000:], y[1000:]))
+"""
 
-mean, std = SGD(data[:1000], label[:1000], optim, 10, 3000)
+kf = KFold(n_splits=10)
+score = []
+
+for id_train, id_test in kf.split(data):
+    h1 = Linear((in_size, h1_size),  init = 'Xavier')
+    h2 = Linear((h1_size, h2_size),  init = 'Xavier')
+    h3 = Linear((h2_size, out_size), init = 'Xavier')
+    
+    seq = Sequentiel(m = [h1, TanH(), h2, TanH(), h3, Softmax()], a = f)
+    optim = Optim(seq, BCELoss(), 0.01)
+    mean, std = SGD(data[id_train], label[id_train], optim, 10, 200)
+    score += [optim.score_predict(data[id_test], y[id_test])]
+
 plt.plot(mean)
 plt.plot(std)
 plt.legend(('mean du loss', 'std du loss'))
 plt.show()
+print(score)
+print(np.mean(score))
+"""
 print("score de train après:",optim.score_predict(data[:1000], y[:1000]))
 print("score de test après:",optim.score_predict(data[1000:], y[1000:]))
+"""

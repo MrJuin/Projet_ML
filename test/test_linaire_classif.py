@@ -24,7 +24,7 @@ X = np.random.random((batch_size, data_size))
 Y = np.random.randint(2, size=(batch_size, nb_h))
 
 line = Linear()
-line._parameters = np.array([[-1.],[-1.]]) #np.random.random((data_size, nb_h))
+line._parameters = np.array([[0.],[1.]]) #np.random.random((data_size, nb_h))
 
 def f(X):
     h = line.forward(X)
@@ -33,7 +33,7 @@ def f(X):
 data, label = tools.gen_arti(centerx=1,centery=1,sigma=0.1,nbex=1000,data_type=0,epsilon=0.02)
 tools.plot_frontiere(data,f,step=20)
 tools.plot_data(data,labels=label)
-# plt.show()
+plt.show()
 
 
 iterations = 10

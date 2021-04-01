@@ -26,13 +26,22 @@ class Module(object):
         pass
 
 class Linear(Module):    
-    def __init__(self, dimensions = None):
+    def __init__(self, dimensions = None, init = None):
         """
         Dimensions est un tuple (dim_in, dim_out), si les dimensions sont passées
         initialise les parameters aléatoirement
         """
+        
         if type(dimensions) != type(None):
-           self._parameters = np.random.random(dimensions) -0.5
+            self._parameters = np.random.randn(dimensions[0], dimensions[1]) -0.5
+            if init == 'randn':
+                pass
+            elif init == 'Xavier':
+                self._parameters *= np.sqrt(2/sum(dimensions))
+            elif init == 'Xaviertanh':
+                self._parameters *= np.sqrt(2)*np.sqrt(2/sum(dimensions))
+            elif init == 'uniform':
+                self._parameters = np.random.random(dimensions) -0.5
         else:
             self._parameters = None
         self._gradient = None

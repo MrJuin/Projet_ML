@@ -6,18 +6,16 @@ Created on Thu Mar 25 11:52:28 2021
 """
 from utils.loss import MSELoss 
 from utils.module import Linear, Sigmoid, TanH
-from utils.toolbox import Sequentiel, Optim
+from utils.toolbox import Sequentiel, Optim, SGD
 import utils.graphtools as tools
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 in_size = 2
 out_size = 1
 h2_size = 4
 h1_size = 5
-
 
 def f(x):
     return np.where(x.reshape(-1) <= 0.5, -1, 1)

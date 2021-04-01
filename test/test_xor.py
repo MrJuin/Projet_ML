@@ -17,9 +17,9 @@ in_size = 2
 h1_size = 2
 
 mse = MSELoss()
-h1 = Linear((in_size, h1_size))
+h1 = Linear((in_size, h1_size), bias = True)
 tanh = TanH()
-h2 = Linear((h1_size, out_size))
+h2 = Linear((h1_size, out_size), bias = True)
 
 
 def f(x):

@@ -50,8 +50,8 @@ for i in range(iterations):
         d1 = line.backward_delta(X, d2)
         
         line.backward_update_gradient(X, d2)
-        line.update_parameters(gradient_step=1e-3)
+        line.update_parameters(gradient_step=1e-2)
         line.zero_grad()
-        tools.plot_frontiere(data,f,step=20)
-        tools.plot_data(data,labels=label)
-        plt.show()
+    tools.plot_frontiere(data,f,step=20)
+    tools.plot_data(data,labels=label)
+    plt.show()

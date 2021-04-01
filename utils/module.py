@@ -26,12 +26,16 @@ class Module(object):
         pass
 
 class Linear(Module):    
-    def __init__(self, dimensions = None, init = None):
+    def __init__(self, dimensions = None, init = None, bias = None):
         """
         Dimensions est un tuple (dim_in, dim_out), si les dimensions sont passées
         initialise les parameters aléatoirement
         """
         
+        if bias:
+            self._bias = np.random.random((1,dimensions[1])) -0.5
+        else :
+            self._bias = None
         if type(dimensions) != type(None):
             self._parameters = np.random.randn(dimensions[0], dimensions[1]) -0.5
             if init == 'randn':
@@ -53,19 +57,37 @@ class Linear(Module):
         output : batch * output
         """
         assert len(X.shape) == 2
-        return np.dot(X, self._parameters)
+        tmp = np.dot(X, self._parameters)
+        if type(self._bias) != type(None):
+            return tmp + self._bias
+        return tmp
+    
+    def update_parameters(self, gradient_step=1e-3):
+        ## Calcule la mise a jour des parametres selon le gradient calcule et le pas de gradient_step
+        self._parameters -= gradient_step*self._gradient
+        
+        if type(self._bias) != type(None):
+            self._bias -=gradient_step*self._biasgrad
     
     def backward_update_gradient(self, input, delta):
         ## Met a jour la valeur du gradient
-        if type(self._gradient) == type(None):
-            self._gradient = np.zeros(self._parameters.shape)
-        self._gradient += np.dot(input.T, delta)
-    
+        try:
+            self._gradient += np.dot(input.T, delta)
+        except (AttributeError, TypeError): # Si _gradient n'existe pas, ou si il vaut None
+            self._gradient = np.dot(input.T, delta)
+        
+        if type(self._bias) != type(None):
+            try:
+                self._biasgrad += np.sum(delta, axis = 0)
+            except (AttributeError, TypeError):
+                self._biasgrad = np.sum(delta, axis = 0)
+                
     def backward_delta(self, input, delta):
         #Doit avoir la même dimension que l'inputS
         return np.dot(delta, self._parameters.T)
     
     def zero_grad(self):
+        self._biasgrad = None
         self._gradient = None
     
 class TanH(Module):

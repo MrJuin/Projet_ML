@@ -48,9 +48,9 @@ kf = KFold(n_splits=10)
 score = []
 
 for id_train, id_test in kf.split(data):
-    h1 = Linear((in_size, h1_size),  init = 'Xavier')
-    h2 = Linear((h1_size, h2_size),  init = 'Xavier')
-    h3 = Linear((h2_size, out_size), init = 'Xavier')
+    h1 = Linear((in_size, h1_size),  init = 'Xavier', bias = True)
+    h2 = Linear((h1_size, h2_size),  init = 'Xavier', bias = True)
+    h3 = Linear((h2_size, out_size), init = 'Xavier', bias = True)
     
     seq = Sequentiel(m = [h1, TanH(), h2, TanH(), h3, Softmax()], a = f)
     optim = Optim(seq, BCELoss(), 0.01)

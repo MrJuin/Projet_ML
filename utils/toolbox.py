@@ -47,10 +47,6 @@ class Optim:
         l = self.net.forward(b_x)
         d = self.loss.backward(b_y, l[0])
         self.net.backward(l, d)
-        """
-        for i in self.net.modules:
-            print(i._gradient)
-        """
         self.net.apply_gradients(self.eps)
         
     def score(self, x, y):

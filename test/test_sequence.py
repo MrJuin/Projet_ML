@@ -14,22 +14,22 @@ import matplotlib.pyplot as plt
 
 in_size = 2
 out_size = 1
-h2_size = 4
-h1_size = 5
+h2_size = 30
+h1_size = 50
 
 def f(x):
     return np.where(x.reshape(-1) <= 0.5, -1, 1)
 
-h1 = Linear((in_size, h1_size))
-h2 = Linear((h1_size, h2_size))
-h3 = Linear((h2_size, out_size))
+h1 = Linear((in_size, h1_size), bias = True)
+h2 = Linear((h1_size, h2_size), bias = True)
+h3 = Linear((h2_size, out_size), bias = True)
 
-seq = Sequentiel(m = [h1, Sigmoid(), h2,Sigmoid(), h3, TanH()], a = f)
+seq = Sequentiel(m = [h1, TanH(), h2,TanH(), h3, Sigmoid()], a = f)
 
 optim = Optim(seq, MSELoss())
 
 
-data, label = tools.gen_arti(centerx=1,centery=1,sigma=0.5,nbex=1000,data_type=0,epsilon=0.02)
+data, label = tools.gen_arti(centerx=1,centery=1,sigma=0.5,nbex=1000,data_type=2,epsilon=0.02)
 def plot():
     tools.plot_frontiere(data,seq.predict,step=20)
     tools.plot_data(data,labels=label)
@@ -55,7 +55,7 @@ def SGD(data, label, optim, batch_size, iterations):
         
     return mean, std
 
-mean, std = SGD(data, label, optim, 10, 30)
+mean, std = SGD(data, label, optim, 10, 100)
 plt.plot(mean)
 plt.plot(std)
 plt.legend(('mean du mse', 'std du mse'))

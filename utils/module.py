@@ -26,7 +26,7 @@ class Module(object):
         pass
 
 class Linear(Module):    
-    def __init__(self, dimensions = None, init = 'Xavier', bias = True):
+    def __init__(self, dimensions = None, init = 'xavier', bias = True):
         """
         Dimensions : un tuple (dim_in, dim_out), si les dimensions sont passées
         initialise les parameters aléatoirement selon la méthode définit dans init,
@@ -40,9 +40,9 @@ class Linear(Module):
                 return None
             if type_ == "randn":
                 return np.random.randn(dimensions[0], dimensions[1]) -0.5
-            if type_ == 'Xavier':
+            if type_ == 'xavier':
                 return (np.random.randn(dimensions[0], dimensions[1]) -0.5)*np.sqrt(2/sum(dimensions))
-            if type_ == 'Xavier_tanh':
+            if type_ == 'xavier_tanh':
                 return (np.random.randn(dimensions[0], dimensions[1]) -0.5)*np.sqrt(2)*np.sqrt(2/sum(dimensions))
             if type_ == 'uniform':
                 return np.random.random(dimensions) -0.5
@@ -51,7 +51,7 @@ class Linear(Module):
         self._gradient   = None
         self._parameters = initialise(dimensions, init)
         if bias:
-            self._bias = initialise((1,dimensions[1]), "uniform")
+            self._bias = initialise((1,dimensions[1]), init)
         else:
             self._bias = None
     
@@ -98,11 +98,7 @@ class TanH(Module):
     def forward(self, X):
         ## Calcule la passe forward
         return np.tanh(X)
-
-    def backward_update_gradient(self, input, delta):
-        ## Pas gradient pas de mise à jour
-        pass
-
+    
     def backward_delta(self, input, delta):
         ## Calcul la derivee de l'erreur
         return delta * (1-np.power(np.tanh(input),2))
@@ -114,10 +110,6 @@ class Sigmoid(Module):
     def forward(self, X):
         ## Calcule la passe forward
         return 1/(1 + np.exp(-X))
-
-    def backward_update_gradient(self, input, delta):
-        ## Pas gradient pas de mise à jour
-        pass
 
     def backward_delta(self, input, delta):
         ## Calcul la derivee de l'erreur
@@ -132,10 +124,6 @@ class Softmax(Module):
         ## Calcule la passe forward
         exp = np.exp(X)
         return exp/np.expand_dims(np.sum(exp ,axis = 1), axis = 1)
-    
-    def backward_update_gradient(self, input, delta):
-        ## Pas gradient pas de mise à jour
-        pass
 
     def backward_delta(self, input, delta):
         ## Calcul la derivee de l'erreur

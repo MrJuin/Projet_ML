@@ -71,7 +71,7 @@ def SGD(data, label, optim, batch_size, iterations):
             mean : moyenne des scores de l'optimiseur à chaque itération
             std  : écart-types des scores de l'optimiseur à chaque itération'
     """
-    deb = data.shape[0]%batch_size
+    deb = data.shape[0]%batch_size # avoir un nbr de donnée multiple du nombre de batch
     b_data  = data[deb:].reshape(-1,batch_size,data.shape[-1])
     b_label = label[deb:].reshape(-1,batch_size, label.shape[-1])
     

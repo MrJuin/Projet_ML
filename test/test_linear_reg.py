@@ -30,6 +30,7 @@ out_size = 1
 # Initialize modules with respective size
 iterations = 30
 batch_size = 10
+
 h1 = Linear((in_size, out_size))
 seq = Sequentiel(m = [h1], a = None)
 optim = Optim(seq, MSELoss(), 0.0001)

@@ -85,3 +85,12 @@ def SGD(data, label, optim, batch_size, iterations):
         mean += [np.mean(cpt)]
         std  += [np.std(cpt)]
     return mean, std
+
+
+def shuffle(data, label, normalise = True):
+    tmp = list(zip(np.array(data), np.array(label, dtype = np.intc)))
+    np.random.shuffle(tmp)
+    data, y = zip(*tmp)
+    if normalise:
+        data /= np.max(data)
+    return data, np.array(y)

@@ -4,10 +4,9 @@ Created on Thu Mar 25 11:52:28 2021
 
 @author: Luc
 """
-from utils.loss import MSELoss, BCELoss
+from utils.loss import MSELoss, BCELoss, CELoss, logSoftMax
 from utils.module import Linear, Sigmoid, TanH, Softmax
-from utils.toolbox import Sequentiel, Optim, SGD
-
+from utils.toolbox import Sequentiel, Optim, SGD, shuffle
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -16,18 +15,8 @@ from sklearn.model_selection import KFold
 
 
 digits = load_digits()
-
-tmp = list(zip(digits.data, digits.target))
-np.random.shuffle(tmp)
-data, y = zip(*tmp)
-data = np.array(data)
-data /= np.sum(data, axis = 1).reshape(-1,1)
-y = np.array(y)
-
-def devellope(x):
-    a = np.zeros(10)
-    a[int(x)] = 1
-    return a
+#On mélange les données
+data, y = shuffle(digits.data, digits.target)
 
 in_size = data.shape[1]
 out_size = 10
@@ -37,33 +26,42 @@ h1_size = 40
 def f(x):
     return np.argmax(x, axis = 1)
 
+label = np.zeros((len(y), 10))
+label[range(len(y)),y] = 1
 
-label = np.array(list(map(devellope, y)))
-"""
-print("score de train avant:",optim.score_predict(data[:1000], y[:1000]))
-print("score de test: avant:",optim.score_predict(data[1000:], y[1000:]))
-"""
 
-kf = KFold(n_splits=10)
+kf = KFold(n_splits=3)
+base = kf.split(data)
+#base = [(range(int(len(data) * 0.9)), range(int(len(data) * 0.9), len(data)))]
+
 score = []
-
-for id_train, id_test in kf.split(data):
-    h1 = Linear((in_size, h1_size),  init = 'Xavier', bias = True)
-    h2 = Linear((h1_size, h2_size),  init = 'Xavier', bias = True)
-    h3 = Linear((h2_size, out_size), init = 'Xavier', bias = True)
+for id_train, id_test in base:
+    h1 = Linear((in_size, h1_size),  init = 'xavier', bias = True)
+    h2 = Linear((h1_size, h2_size),  init = 'xavier', bias = True)
+    h3 = Linear((h2_size, out_size), init = 'xavier', bias = True)
     
-    seq = Sequentiel(m = [h1, TanH(), h2, TanH(), h3, Softmax()], a = f)
-    optim = Optim(seq, BCELoss(), 0.01)
-    mean, std = SGD(data[id_train], label[id_train], optim, 10, 200)
+    def BCE():
+        seq = Sequentiel(m = [h1, TanH(), h2, TanH(), h3, Softmax()], a = f)
+        optim = Optim(seq, BCELoss(), 1e-3)
+        return seq, optim
+    
+    def CE():
+        seq = Sequentiel(m = [h1, TanH(), h2, TanH(), h3, Softmax()], a = f)
+        optim = Optim(seq, CELoss(), 0.01)
+        return seq, optim
+    
+    def SoftmaxCE():
+        seq = Sequentiel(m = [h1, TanH(), h2, TanH(), h3], a = f)
+        optim = Optim(seq, logSoftMax(), 1e-3)
+        return seq, optim
+    
+    seq, optim = SoftmaxCE()
+    mean, std = SGD(data[id_train], label[id_train], optim, 10, 500)
     score += [optim.score_predict(data[id_test], y[id_test])]
-
+    
 plt.plot(mean)
 plt.plot(std)
 plt.legend(('mean du loss', 'std du loss'))
 plt.show()
 print(score)
 print(np.mean(score))
-"""
-print("score de train après:",optim.score_predict(data[:1000], y[:1000]))
-print("score de test après:",optim.score_predict(data[1000:], y[1000:]))
-"""

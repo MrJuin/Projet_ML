@@ -30,7 +30,7 @@ class BCELoss(Loss):
         """
         assert len(y.shape) == 2
         assert len(yhat.shape) == 2
-        return - (y* max(-100,np.log(yhat+eps)) + (1-y)*max(-100,np.log(1-yhat+eps)))
+        return - (y*np.log(yhat+eps) + (1-y)*np.log(1-yhat+eps))
 
     def backward(self, y, yhat, eps = 1e-10):
         return ((1-y)/(1-yhat +eps)) - (y/(yhat +eps))

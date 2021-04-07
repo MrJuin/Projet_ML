@@ -18,15 +18,13 @@ h2_size = 10
 kf = KFold(n_splits=3)
 #base = kf.split(data)
 base = [(range(int(len(data) * 0.9)), range(int(len(data) * 0.9), len(data)))]
-print('debut')
 for id_train, id_test in base:
     h1 = Linear((in_size, h1_size), init = 'xavier', bias = True)
     h2 = Linear((h1_size, h2_size), init = 'xavier', bias = True)
     
-    h3 = Linear(None, init = 'xavier', bias = True)
+    h3 = Linear((h2_size, h1_size), init = 'xavier', bias = True)
     h3._parameters = h2._parameters.T
-    
-    h4 = Linear(None, init = 'xavier', bias = True)
+    h4 = Linear((h1_size, in_size), init = 'xavier', bias = True)
     h4._parameters = h1._parameters.T
     
     Codeur   = [h1, TanH(), h2, TanH()]
@@ -35,14 +33,17 @@ for id_train, id_test in base:
     seq = Sequentiel(m = Codeur + Decodeur)
     optim = Optim(seq, BCELoss(), 1e-3)
     
-    mean, std = SGD(data[id_train], data[id_train], optim, 10, 20)
+    mean, std = SGD(data[id_train], data[id_train], optim, 10, 100)
 
 plt.plot(mean)
 plt.plot(std)
 plt.legend(('mean du loss', 'std du loss'))
 plt.show()
 
-plt.imshow(data[0].reshape(28,28))
-plt.show()
-plt.imshow(seq.predict(data[0].reshape(1,-1)).reshape(28,28))
+exemple = [list(y).index(i) for i in range(10)]
+
+fig,ax = plt.subplots(10,2, figsize = (30,30), gridspec_kw = {'wspace' : -0.9})
+for i in range(10):
+    ax[i][0].imshow(data[exemple[i]].reshape(28,28))
+    ax[i][1].imshow(seq.predict(data[exemple[i]].reshape(1,-1)).reshape(28,28))
 plt.show()

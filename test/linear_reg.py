@@ -8,10 +8,11 @@ from utils.toolbox import SGD, Optim, Sequentiel
 import matplotlib.pyplot as plt
 
 coef1 = 1002
-coef2 = 13
+coef2 = 123
+b = 125
 # fonction linéair que l'on apprend
 def f(x1,x2):
-    return x1*coef1 + coef2*x2
+    return x1*coef1 + coef2*x2 + b
 
 # données d'entrainement avec bruit
 def f_bruit(x1,x2):
@@ -31,9 +32,10 @@ out_size = 1
 iterations = 30
 batch_size = 10
 
-h1 = Linear((in_size, out_size))
+h1 = Linear((in_size, out_size), bias = True, init = "uniform")
+
 seq = Sequentiel(m = [h1], a = None)
-optim = Optim(seq, MSELoss(), 0.0001)
+optim = Optim(seq, MSELoss(), 1e-3)
 
 l_mean, l_sgd = SGD(data, label, optim, batch_size, iterations)
 
@@ -41,4 +43,5 @@ plt.plot(l_mean)
 plt.show()
 
 print("parameters:",str(h1._parameters))
-print("valeurs voulues:",str([[coef1],[coef2]]))
+print("parameters:",str(h1._bias))
+print("valeurs voulues:",str([[coef1],[coef2], [b]]))

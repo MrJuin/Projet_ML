@@ -23,7 +23,7 @@ class MSELoss(Loss):
     
 
 class BCELoss(Loss):
-    def forward(self, y, yhat, eps = 1e-100):
+    def forward(self, y, yhat, eps = 1e-10):
         """
         input  : batch*d
         output : batch

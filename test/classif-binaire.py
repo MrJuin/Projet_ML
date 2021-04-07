@@ -29,7 +29,7 @@ seq = Sequentiel(m = [h1, TanH(), h2,TanH(), h3, Sigmoid()], a = f)
 optim = Optim(seq, MSELoss())
 
 
-data, label = tools.gen_arti(centerx=1,centery=1,sigma=0.5,nbex=1000,data_type=2,epsilon=0.02)
+data, label = tools.gen_arti(centerx=1,centery=1,sigma=0.5,nbex=1000,data_type=1,epsilon=0.02)
 def plot():
     tools.plot_frontiere(data,seq.predict,step=20)
     tools.plot_data(data,labels=label)
@@ -50,7 +50,7 @@ def SGD(data, label, optim, batch_size, iterations):
             
         mean += [np.mean(cpt)]
         std  += [np.std(cpt)]
-        #plot()
+        plot()
         
     return mean, std
 

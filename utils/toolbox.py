@@ -34,8 +34,9 @@ class Sequentiel:
             m.zero_grad()
                 
     def predict(self, x):
-        return self.activation(self.forward(x)[0])
-
+        if type(self.activation) != type(None):
+            return self.activation(self.forward(x)[0])
+        return self.forward(x)[0]
 
 class Optim:
     def __init__(self, net, loss, eps = 1e-2):

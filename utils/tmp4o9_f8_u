@@ -49,12 +49,13 @@ class Linear(Module):
             raise Exception('initialisation inconnue')            
         
         self._gradient   = None
-
+        self._bias = None
         self._parameters = initialise(dimensions, init)
-        if type(self._parameters) != type(None) and bias:
-            self._bias = initialise((1,dimensions[1]), init)
-        else :
-            self._bias = None            
+        if type(self.parameters) != type(None):
+            if bias:
+                self._bias = initialise((1,dimensions[1]), init)
+            else:
+                
     
     def forward(self, X):
         """

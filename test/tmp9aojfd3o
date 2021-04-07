@@ -18,16 +18,12 @@ h2_size = 10
 kf = KFold(n_splits=3)
 #base = kf.split(data)
 base = [(range(int(len(data) * 0.9)), range(int(len(data) * 0.9), len(data)))]
-print('debut')
+
 for id_train, id_test in base:
     h1 = Linear((in_size, h1_size), init = 'xavier', bias = True)
     h2 = Linear((h1_size, h2_size), init = 'xavier', bias = True)
-    
-    h3 = Linear(None, init = 'xavier', bias = True)
-    h3._parameters = h2._parameters.T
-    
-    h4 = Linear(None, init = 'xavier', bias = True)
-    h4._parameters = h1._parameters.T
+    h3 = Linear((h2_size, h1_size), init = 'xavier', bias = True)
+    h4 = Linear((h1_size, in_size), init = 'xavier', bias = True)
     
     Codeur   = [h1, TanH(), h2, TanH()]
     Decodeur = [h3, TanH(), h4, Sigmoid()]
@@ -37,6 +33,9 @@ for id_train, id_test in base:
     
     mean, std = SGD(data[id_train], data[id_train], optim, 10, 20)
 
+
+
+    
 plt.plot(mean)
 plt.plot(std)
 plt.legend(('mean du loss', 'std du loss'))
@@ -45,4 +44,5 @@ plt.show()
 plt.imshow(data[0].reshape(28,28))
 plt.show()
 plt.imshow(seq.predict(data[0].reshape(1,-1)).reshape(28,28))
+
 plt.show()

@@ -20,7 +20,7 @@ def f(x):
     return np.argmax(x, axis = 1)
 
 label = np.zeros((len(y), 10))
-label[range(len(y)),y] = 1
+label[range(len(y)),np.intc(y)] = 1
 
 kf = KFold(n_splits=3)
 #base = kf.split(data)

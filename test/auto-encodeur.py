@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import KFold
 
-mnist = fetch_openml('mnist_784', version=1)
+mnist = fetch_openml('mnist_784', version=1,data_home='files')
 #On mélange les données
 data, y = shuffle(mnist.data[:3000], mnist.target[:3000])
 
@@ -33,17 +33,28 @@ for id_train, id_test in base:
     seq = Sequentiel(m = Codeur + Decodeur)
     optim = Optim(seq, BCELoss(), 1e-3)
     
-    mean, std = SGD(data[id_train], data[id_train], optim, 10, 100)
+    mean, std = SGD(data[id_train], data[id_train], optim, 10, 200)
 
 plt.plot(mean)
 plt.plot(std)
 plt.legend(('mean du loss', 'std du loss'))
 plt.show()
 
-exemple = [list(y).index(i) for i in range(10)]
 
-fig,ax = plt.subplots(10,2, figsize = (30,30), gridspec_kw = {'wspace' : -0.9})
-for i in range(10):
-    ax[i][0].imshow(data[exemple[i]].reshape(28,28))
-    ax[i][1].imshow(seq.predict(data[exemple[i]].reshape(1,-1)).reshape(28,28))
-plt.show()
+def plot(sens = 'h'):
+    exemple = [list(y).index(i) for i in range(10)]
+    
+    if sens == 'v':
+        fig,ax = plt.subplots(10,2, figsize = (30,30), gridspec_kw = {'wspace' : -0.9})
+        for i in range(10):
+            ax[i][0].imshow(data[exemple[i]].reshape(28,28))
+            ax[i][1].imshow(seq.predict(data[exemple[i]].reshape(1,-1)).reshape(28,28))
+
+    else:
+        fig,ax = plt.subplots(2,10, figsize = (30,30), gridspec_kw = {'hspace' : -0.9})
+        for i in range(10):
+            ax[0][i].imshow(data[exemple[i]].reshape(28,28))
+            ax[1][i].imshow(seq.predict(data[exemple[i]].reshape(1,-1)).reshape(28,28))
+    
+    plt.show()
+plot()

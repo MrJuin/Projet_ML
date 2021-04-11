@@ -72,26 +72,29 @@ def SGD(data, label, optim, batch_size, iterations):
             mean : moyenne des scores de l'optimiseur à chaque itération
             std  : écart-types des scores de l'optimiseur à chaque itération'
     """
+    assert len(data) == len(label)
+    
+    data, label = shuffle(data, label, normalise = False)
     deb = data.shape[0]%batch_size # avoir un nbr de donnée multiple du nombre de batch
-    b_data  = data[deb:].reshape(-1,batch_size,data.shape[-1])
-    b_label = label[deb:].reshape(-1,batch_size, label.shape[-1])
+    b_data  = data[deb:].reshape([-1,batch_size] + list(data.shape[1:]))
+    b_label = label[deb:].reshape([-1,batch_size] + list(label.shape[1:]))
     
     mean = []
     std  = []
     for i in range(iterations):
         cpt = []
-        for x, y in zip(b_data, b_label):
-            cpt += [optim.score(x,y)[-1]]
-            optim.step(x, y)
+        for j in range(len(b_label)):
+            cpt += [optim.score(b_data[j],b_label[j])[-1]]
+            optim.step(b_data[j], b_label[j])
         mean += [np.mean(cpt)]
         std  += [np.std(cpt)]
     return mean, std
 
 
 def shuffle(data, label, normalise = True):
-    tmp = list(zip(np.array(data), np.array(label, dtype = np.intc)))
+    tmp = list(zip(np.array(data), np.array(label, dtype = np.float64)))
     np.random.shuffle(tmp)
     data, y = zip(*tmp)
     if normalise:
         data /= np.max(data)
-    return data, np.array(y)
+    return np.array(data), np.array(y)

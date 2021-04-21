@@ -14,17 +14,21 @@ data = np.expand_dims(data, axis = -1)
 label = np.zeros((len(y), 10))
 label[range(len(y)),np.intc(y)] = 1
 
+
 i = data[:100]
 
 conv = Conv1D(3, 1, 32)
 tmp = conv.forward(i)
 tmp2 = conv.backward_delta(i, tmp)
 
+conv.zero_grad()
 conv.backward_update_gradient(i, tmp)
 
+t5 = conv._gradient
+
 maxpool = MaxPool1D(2,1)
-d1 = maxpool.forward(i)
-out = maxpool.backward_delta(i, d1)
+maxd1 = maxpool.forward(tmp)
+out = maxpool.backward_delta(tmp, maxd1)
 
 
 def f(x):
@@ -33,7 +37,6 @@ def f(x):
 kf = KFold(n_splits=3)
 #base = kf.split(data)
 base = [(range(int(len(data) * 0.9)), range(int(len(data) * 0.9), len(data)))]
-
 for id_train, id_test in base:
     
     conv    = Conv1D(3, 1, 10, init = 'xavier')
@@ -43,9 +46,9 @@ for id_train, id_test in base:
     h2 = Linear((100, 10)  , init = 'xavier', bias = True)
     
     seq = Sequentiel(m=[conv, maxpool, flat, h1, Relu(), h2], a = f)
-    optim = Optim(seq, logSoftMax(), 1e-3)
+    optim = Optim(seq, logSoftMax(), 1e-5)
     
-    mean, std = SGD(data[id_train], label[id_train], optim, 100, 100)
+    mean, std = SGD(data[id_train], label[id_train], optim, 10, 100)
 
 plt.plot(mean)
 plt.plot(std)

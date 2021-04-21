@@ -124,8 +124,16 @@ class Conv1D(Module):
         input = X[:,a,:].reshape(X.shape[0], -1, self.k_size* self.chan_in)
         input = np.transpose(input, (1, 0, 2))
         def call(x):
-            return np.dot(x,self._parameters.reshape(-1, self.chan_out))
-        return np.transpose(np.array(list(map(call, input))), (1,0,2))
+            return np.dot(X,self._parameters.reshape(-1, self.chan_out))
+        return np.transpose(np.apply_along_axis(call,-1, input), (1, 0, 2))
+        """
+        z = zip(range(0, X.shape[1], 1+ self.stride), \
+                range(self.k_size, X.shape[1], 1+self.stride))
+            
+        tmp = np.array([np.dot(X[:,beg:end].reshape(-1,self.k_size*self.chan_in),\
+        self._parameters.reshape(-1, self.chan_out))for beg, end in z])
+        return tmp.reshape(X.shape[0],-1,self.chan_out)
+        """
     
     def update_parameters(self, gradient_step=1e-3):
         ## Calcule la mise a jour des parametres selon le gradient calcule et le pas de gradient_step
@@ -135,16 +143,13 @@ class Conv1D(Module):
         ## Met a jour la valeur du gradient
         if self._gradient is None: 
             self._gradient = np.zeros(self._parameters.shape)
-        
-        a,_ = np.mgrid[0:input.shape[1]-self.k_size:(self.stride+1), 0:self.k_size] \
-        + np.arange(self.k_size)
-        a = a.reshape(-1)
-        input = input[:,a,:].reshape(input.shape[0], -1, self.k_size* self.chan_in)
-        input = np.transpose(input, (1, 0, 2))
-        for i in range(input.shape[0]):
-            self._gradient += np.dot(input[i,:].T,delta[:, i, :]).reshape(self._gradient.shape)
             
-
+        z = zip(range(0, input.shape[1], 1+ self.stride), \
+        range(self.k_size, input.shape[1], 1+self.stride))
+        for i, (beg, end) in enumerate(z):
+            self._gradient += np.dot(input[:,beg:end].reshape(input.shape[0],-1).T,\
+                       delta[:, i, :]).reshape(self._gradient.shape)
+        
     def backward_delta(self, input, delta):
         z = zip(range(0, input.shape[1], 1+ self.stride), \
         range(self.k_size, input.shape[1], 1+self.stride))
@@ -194,11 +199,20 @@ class MaxPool1D(Module):
         res = np.zeros(input.shape)
         for i, (beg, end) in enumerate(z):
             t = np.argmax(input[:,beg:end], axis = 1)
-            res[np.repeat(range(batch),dim),beg + t.reshape(-1),\
-                np.tile(range(dim),batch)]\
+            res[np.repeat(range(batch),dim),beg + t.reshape(-1), range(dim)]\
                 += delta[:,i,:].reshape(-1)
         return res
-            
+        """
+        res = np.zeros(input.shape)
+        for i, (beg, end) in enumerate(z):
+            t = np.argmax(input[:,beg:end], axis = 1)
+            for j in range(input.shape[0]):
+                res[j,beg + t[j],range(input.shape[-1])] += delta[j,i,:]
+        return res
+        """
+        
+        
+    
 
 
 class Flatten(Module):

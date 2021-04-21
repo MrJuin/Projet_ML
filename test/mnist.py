@@ -28,9 +28,9 @@ base = [(range(int(len(data) * 0.9)), range(int(len(data) * 0.9), len(data)))]
 
 score = []
 for id_train, id_test in base:
-    h1 = Linear((in_size, h1_size),  init = 'xavier', bias = True)
-    h2 = Linear((h1_size, h2_size),  init = 'xavier', bias = True)
-    h3 = Linear((h2_size, out_size), init = 'xavier', bias = True)
+    h1 = Linear((in_size, h1_size),  init = 'uniform', bias = True)
+    h2 = Linear((h1_size, h2_size),  init = 'uniform', bias = True)
+    h3 = Linear((h2_size, out_size), init = 'uniform', bias = True)
     def BCE():
         seq = Sequentiel(m = [h1, TanH(), h2, TanH(), h3, Softmax()], a = f)
         optim = Optim(seq, BCELoss(), 1e-2)
@@ -46,7 +46,7 @@ for id_train, id_test in base:
         optim = Optim(seq, logSoftMax(), 1e-4)
         return seq, optim
     
-    seq, optim = BCE()
+    seq, optim = SoftmaxCE()
     mean, std = SGD(data[id_train], label[id_train], optim, 10, 500)
     score += [optim.score_predict(data[id_test], y[id_test])]
     

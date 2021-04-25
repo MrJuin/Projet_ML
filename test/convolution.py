@@ -7,7 +7,9 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import KFold
 
-#mnist = fetch_openml('mnist_784', version=1, data_home='files')
+mnist = fetch_openml('mnist_784', version=1, data_home='files')
+#%%
+
 #On mélange les données
 data, y = shuffle(mnist.data[:3000], mnist.target[:3000])
 data = np.expand_dims(data, axis = -1)
@@ -30,7 +32,7 @@ maxpool = MaxPool1D(2,1)
 maxd1 = maxpool.forward(tmp)
 out = maxpool.backward_delta(tmp, maxd1)
 
-
+#%%
 def f(x):
     return np.argmax(x, axis = 1)
 
@@ -43,12 +45,13 @@ for id_train, id_test in base:
     maxpool = MaxPool1D(2,2)
     flat    = Flatten()
     h1 = Linear((2600, 100), init = 'xavier', bias = True)
-    h2 = Linear((100, 10)  , init = 'xavier', bias = True)
+    h2 = Linear((100, 10), init = 'xavier', bias = True)
+    #h3 = Linear((100, 10)  , init = 'xavier', bias = True)
     
     seq = Sequentiel(m=[conv, maxpool, flat, h1, Relu(), h2], a = f)
-    optim = Optim(seq, logSoftMax(), 1e-5)
+    optim = Optim(seq, logSoftMax(), 1e-3)
     
-    mean, std = SGD(data[id_train], label[id_train], optim, 10, 100)
+    mean, std = SGD(data[id_train], label[id_train], optim, 100, 10)
 
 plt.plot(mean)
 plt.plot(std)

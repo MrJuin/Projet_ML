@@ -173,13 +173,12 @@ class MaxPool1D(Module):
     def forward(self, X):
         """
         input  : batch * input * chan_in
-        output : batch * (input - k_size/stride + 1)* chan_out
+        output : batch * (input - k_size/stride + 1, chan_in)
         """
         z = zip(range(0, X.shape[1], 1+self.stride), \
                 range(self.k_size, X.shape[1], 1+self.stride))
-            
         tmp = np.array([np.max(X[:,beg:end], axis = 1) for beg, end in z])
-        return tmp.reshape(X.shape[0],-1,X.shape[2])
+        return np.transpose(tmp, (1,0,2))
     
     def update_parameters(self, gradient_step=1e-3):
         ## Calcule la mise a jour des parametres selon le gradient calcule et le pas de gradient_step

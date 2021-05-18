@@ -21,11 +21,9 @@ data, y = shuffle(mnist.data[:3000], mnist.target[:3000])
 data = np.expand_dims(data, axis = -1)
 label = np.zeros((len(y), 10))
 label[range(len(y)),np.intc(y)] = 1
-i = data[:100]
+i = data[:200]
 
 conv = Conv1D(3, 1, 32)
-tmp = conv.forward(i)
-tmp2 = conv.backward_delta(i, tmp)
 tmp = conv.forward(i)
 tmp2 = conv.backward_delta(i, tmp)
 
@@ -37,12 +35,11 @@ maxpool = MaxPool1D(2,1)
 maxd1 = maxpool.forward(tmp)
 out = maxpool.backward_delta(tmp, maxd1)
 
+delta_ = tmp
+
 #%% maxPool backward delta
 input = tmp
 delta = maxd1
-
-
-
 
 z = zip(range(0             , input.shape[1], 1+maxpool.stride), \
         range(maxpool.k_size, input.shape[1], 1+maxpool.stride))
@@ -87,12 +84,79 @@ for i, (beg, end) in enumerate(z):
         
 res4 = np.array(res4)
 
+#%% Convolution forward
+from time import time
+self = conv
+def conv_forw_1_t():
+    t = time()
+    
+    X = data[:1000]
+    a,_ = np.mgrid[0:X.shape[1]-self.k_size:(self.stride+1), 0:self.k_size] + np.arange(self.k_size)
+    a = a.reshape(-1)
+    input = X[:,a,:].reshape(X.shape[0], -1, self.k_size* self.chan_in)
+    input = np.transpose(input, (1, 0, 2))
+    def call(x):
+        return np.dot(x,self._parameters.reshape(-1, self.chan_out))
+    ret1 = np.transpose(np.array(list(map(call, input))), (1,0,2))
+    return time()-t, ret1
 
+def conv_forw_2_t():
+    X = data[:1000]
+    
+    t = time()
+    z = zip(range(0, X.shape[1], 1+ self.stride), \
+            range(self.k_size, X.shape[1], 1+self.stride))
+    tmp = np.array([np.dot(X[:,beg:end].reshape(-1,self.k_size*self.chan_in),\
+    self._parameters.reshape(-1, self.chan_out))for beg, end in z])
+    ret2 = np.transpose(tmp, (1,0,2))
+    return time()-t, ret2
 
+cpt = [[],[]]
+for i in range(100):
+    cpt[0] += [conv_forw_1_t()[0]]
+    cpt[1] += [conv_forw_2_t()[0]]
+
+#%% Convolution backward
+def conv_back_1_t():
+    input = data[:200]
+    delta = delta_
+    t = time()
+    self._gradient = np.zeros(self._parameters.shape)
+    a,_ = np.mgrid[0:input.shape[1]-self.k_size:(self.stride+1), 0:self.k_size] \
+    + np.arange(self.k_size)
+    a = a.reshape(-1)
+    input = input[:,a,:].reshape(input.shape[0], -1, self.k_size* self.chan_in)
+    input = np.transpose(input, (1, 0, 2))
+    for i in range(input.shape[0]):
+        self._gradient += np.dot(input[i,:].T,delta[:, i, :]).reshape(self._gradient.shape)
+    
+    grad1 = self._gradient.copy()
+    return time()-t, grad1
+
+def conv_back_2_t():
+    input = data[:200]
+    delta = delta_
+    t = time()
+    self._gradient = np.zeros(self._parameters.shape)
+    
+    z = zip(range(0, input.shape[1], 1+ self.stride), \
+    range(self.k_size, input.shape[1], 1+self.stride))
+    for i, (beg, end) in enumerate(z):
+        self._gradient += np.dot(input[:,beg:end].reshape(input.shape[0],-1).T,\
+                   delta[:, i, :]).reshape(self._gradient.shape)
+            
+    grad2 = self._gradient.copy()
+    return time()-t, grad2
+cpt = [[],[]]
+for i in range(100):
+    cpt[0] += [conv_back_1_t()[0]]
+    cpt[1] += [conv_back_2_t()[0]]
+    
+    
 
 #%%
-
-
+X = input
+from time import time
 conv = Conv1D(3, 1, 32)
 tmp = conv.forward(X)
 
@@ -128,8 +192,9 @@ r2 =  np.transpose(tmp, (1, 0, 2))
 print(time.time()-ti)
 
 #%%
+import time
 ti = time.time()  
-input = X
+input = i
 d1 = r1
 g1 = np.zeros(conv._parameters.shape)
 

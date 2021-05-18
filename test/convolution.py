@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import KFold
-
+#%%
 mnist = fetch_openml('mnist_784', version=1, data_home='files')
 #%%
 
@@ -28,7 +28,7 @@ conv.backward_update_gradient(i, tmp)
 
 t5 = conv._gradient
 
-maxpool = MaxPool1D(2,1)
+maxpool = MaxPool1D(2,2)
 maxd1 = maxpool.forward(tmp)
 out = maxpool.backward_delta(tmp, maxd1)
 
@@ -41,14 +41,18 @@ kf = KFold(n_splits=3)
 base = [(range(int(len(data) * 0.9)), range(int(len(data) * 0.9), len(data)))]
 for id_train, id_test in base:
     
-    conv    = Conv1D(3, 1, 10, init = 'xavier')
-    maxpool = MaxPool1D(2,2)
+    conv1    = Conv1D(50, 1, 32, init = 'xavier')
+    maxpool1 = MaxPool1D(4,2)
+    
+    conv2    = Conv1D(6, 32, 10, init = 'xavier')
+    maxpool2 = MaxPool1D(2,2)
+    
     flat    = Flatten()
-    h1 = Linear((2600, 100), init = 'xavier', bias = True)
+    h1 = Linear((790, 100), init = 'xavier', bias = True)
     h2 = Linear((100, 10), init = 'xavier', bias = True)
     #h3 = Linear((100, 10)  , init = 'xavier', bias = True)
     
-    seq = Sequentiel(m=[conv, maxpool, flat, h1, Relu(), h2], a = f)
+    seq = Sequentiel(m=[conv1, maxpool1, conv2, maxpool2, flat, h1, Relu(), h2], a = f)
     optim = Optim(seq, logSoftMax(), 1e-3)
     
     mean, std = SGD(data[id_train], label[id_train], optim, 100, 10)
